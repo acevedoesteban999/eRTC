@@ -19,6 +19,8 @@ typedef struct{
    uint8_t year;
 }rtc_data;
 
+extern char BufferRtcI2C[25];
+
 esp_err_t rtc_init();
 void rtc_set_time();
 rtc_data rtc_read();

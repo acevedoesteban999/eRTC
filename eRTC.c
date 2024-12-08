@@ -1,6 +1,6 @@
 #include "eRTC.h"
 
-
+char BufferRtcI2C[25] = "";
 
 uint8_t decimal_to_bcd(uint8_t decimal) {
     return ((decimal / 10) << 4) | (decimal % 10);
