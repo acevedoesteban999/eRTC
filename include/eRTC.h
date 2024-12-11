@@ -21,6 +21,6 @@ typedef struct{
 
 extern char BufferRtcI2C[25];
 
-esp_err_t rtc_init();
+esp_err_t rtc_init_master();
 void rtc_set_time();
 rtc_data rtc_read();

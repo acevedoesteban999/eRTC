@@ -1,7 +1,5 @@
 #include "eRTC.h"
 
-char BufferRtcI2C[25] = "";
-
 uint8_t decimal_to_bcd(uint8_t decimal) {
     return ((decimal / 10) << 4) | (decimal % 10);
 }
@@ -11,10 +9,25 @@ uint8_t bcd_to_decimal(uint8_t bcd) {
 }
 
 
-esp_err_t rtc_init()
+esp_err_t rtc_init_master()
 {
-    return i2c_master_init(I2C_SDA_PIN,I2C_SCL_PIN,I2C_PORT);
+    esp_err_t err =  i2c_master_init(I2C_SDA_PIN,I2C_SCL_PIN,I2C_PORT);
+    // is_slave_active(SLAVE_ADDRESS_RTC);
+    return err;
 }
+
+//TODO is_slave_active in "rtc_init_master"
+// bool is_slave_active(uint8_t slave_addr) {
+//     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+//     i2c_master_start(cmd);
+//     i2c_master_write_byte(cmd, (slave_addr << 1) | I2C_MASTER_WRITE, true);
+//     i2c_master_stop(cmd);
+    
+//     esp_err_t ret = i2c_master_cmd_begin(I2C_PORT, cmd, pdMS_TO_TICKS(1000));
+//     i2c_cmd_link_delete(cmd);
+
+//     return (ret == ESP_OK);
+// }
 
 void rtc_set_time() {
     uint8_t data[7];
