@@ -29,16 +29,16 @@ esp_err_t rtc_init_master()
 //     return (ret == ESP_OK);
 // }
 
-void rtc_set_time() {
+void rtc_set_time(rtc_data _rtc_data) {
     uint8_t data[7];
 
-    data[0] = decimal_to_bcd(0);    // s 
-    data[1] = decimal_to_bcd(0);    // m 
-    data[2] = decimal_to_bcd(21);   // h(24h)
-    data[3] = decimal_to_bcd(2);    // day (1 Sunday)
-    data[4] = decimal_to_bcd(21);   // Month day (1)
-    data[5] = decimal_to_bcd(10);   // M 
-    data[6] = decimal_to_bcd(24);   // Y
+    data[0] = decimal_to_bcd(_rtc_data.seconds);    // s 
+    data[1] = decimal_to_bcd(_rtc_data.minutes);    // m 
+    data[2] = decimal_to_bcd(_rtc_data.hours);   // h(24h)
+    data[3] = decimal_to_bcd(_rtc_data.day_of_week);    // day (1 Sunday)
+    data[4] = decimal_to_bcd(_rtc_data.day_of_month);   // Month day (1)
+    data[5] = decimal_to_bcd(_rtc_data.month);   // M 
+    data[6] = decimal_to_bcd(_rtc_data.year);   // Y
 
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start(cmd);

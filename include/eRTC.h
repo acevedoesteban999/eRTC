@@ -13,8 +13,8 @@ typedef struct{
    uint8_t seconds;
    uint8_t minutes;
    uint8_t hours;
-   uint8_t day_of_week;
-   uint8_t day_of_month;
+   uint8_t day_of_week;    //1 Sunday
+   uint8_t day_of_month;   
    uint8_t month;
    uint8_t year;
 }rtc_data;
@@ -22,5 +22,5 @@ typedef struct{
 extern char BufferRtcI2C[25];
 
 esp_err_t rtc_init_master();
-void rtc_set_time();
+void rtc_set_time(rtc_data _rtc_data);
 rtc_data rtc_read();
