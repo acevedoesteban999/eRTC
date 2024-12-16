@@ -10,13 +10,13 @@
 #define SLAVE_ADDRESS_RTC 0x68 
 
 typedef struct{
-   uint8_t seconds;
-   uint8_t minutes;
-   uint8_t hours;
-   uint8_t day_of_week;    //1 Sunday
-   uint8_t day_of_month;   
-   uint8_t month;
-   uint8_t year;
+   unsigned seconds;
+   unsigned minutes;
+   unsigned hours;
+   unsigned day_of_week;    //1 Sunday
+   unsigned day_of_month;   
+   unsigned month;
+   unsigned year;
 }rtc_data;
 
 extern char BufferRtcI2C[25];
