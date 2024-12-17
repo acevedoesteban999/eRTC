@@ -1,7 +1,5 @@
 #include "eRTC.h"
 
-
-
 uint8_t decimal_to_bcd(uint8_t decimal) {
     return ((decimal / 10) << 4) | (decimal % 10);
 }
@@ -11,21 +9,36 @@ uint8_t bcd_to_decimal(uint8_t bcd) {
 }
 
 
-esp_err_t rtc_init()
+esp_err_t rtc_init_master()
 {
-    return i2c_master_init(I2C_SDA_PIN,I2C_SCL_PIN,I2C_PORT);
+    esp_err_t err =  i2c_master_init(I2C_SDA_PIN,I2C_SCL_PIN,I2C_PORT);
+    // is_slave_active(SLAVE_ADDRESS_RTC);
+    return err;
 }
 
-void rtc_set_time() {
+//TODO is_slave_active in "rtc_init_master"
+// bool is_slave_active(uint8_t slave_addr) {
+//     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+//     i2c_master_start(cmd);
+//     i2c_master_write_byte(cmd, (slave_addr << 1) | I2C_MASTER_WRITE, true);
+//     i2c_master_stop(cmd);
+    
+//     esp_err_t ret = i2c_master_cmd_begin(I2C_PORT, cmd, pdMS_TO_TICKS(1000));
+//     i2c_cmd_link_delete(cmd);
+
+//     return (ret == ESP_OK);
+// }
+
+void rtc_set_time(rtc_data _rtc_data) {
     uint8_t data[7];
 
-    data[0] = decimal_to_bcd(0);    // s 
-    data[1] = decimal_to_bcd(0);    // m 
-    data[2] = decimal_to_bcd(21);   // h(24h)
-    data[3] = decimal_to_bcd(2);    // day (1 Sunday)
-    data[4] = decimal_to_bcd(21);   // Month day (1)
-    data[5] = decimal_to_bcd(10);   // M 
-    data[6] = decimal_to_bcd(24);   // Y
+    data[0] = decimal_to_bcd(_rtc_data.seconds);    // s 
+    data[1] = decimal_to_bcd(_rtc_data.minutes);    // m 
+    data[2] = decimal_to_bcd(_rtc_data.hours);   // h(24h)
+    data[3] = decimal_to_bcd(_rtc_data.day_of_week);    // day (1 Sunday)
+    data[4] = decimal_to_bcd(_rtc_data.day_of_month);   // Month day (1)
+    data[5] = decimal_to_bcd(_rtc_data.month);   // M 
+    data[6] = decimal_to_bcd(_rtc_data.year);   // Y
 
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start(cmd);
