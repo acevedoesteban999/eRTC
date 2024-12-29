@@ -9,14 +9,14 @@ uint8_t bcd_to_decimal(uint8_t bcd) {
 }
 
 
-esp_err_t rtc_init_master()
+esp_err_t ertc_init_master()
 {
-    esp_err_t err =  i2c_master_init(I2C_SDA_PIN,I2C_SCL_PIN,I2C_PORT);
+    esp_err_t err =  ei2c_master_init(I2C_SDA_PIN,I2C_SCL_PIN,I2C_PORT);
     // is_slave_active(SLAVE_ADDRESS_RTC);
     return err;
 }
 
-//TODO is_slave_active in "rtc_init_master"
+//TODO is_slave_active in "ertc_init_master"
 // bool is_slave_active(uint8_t slave_addr) {
 //     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
 //     i2c_master_start(cmd);
@@ -29,16 +29,16 @@ esp_err_t rtc_init_master()
 //     return (ret == ESP_OK);
 // }
 
-void rtc_set_time(rtc_data _rtc_data) {
+void ertc_set_time(ertc_data _ertc_data) {
     uint8_t data[7];
 
-    data[0] = decimal_to_bcd(_rtc_data.seconds);    // s 
-    data[1] = decimal_to_bcd(_rtc_data.minutes);    // m 
-    data[2] = decimal_to_bcd(_rtc_data.hours);   // h(24h)
-    data[3] = decimal_to_bcd(_rtc_data.day_of_week);    // day (1 Sunday)
-    data[4] = decimal_to_bcd(_rtc_data.day_of_month);   // Month day (1)
-    data[5] = decimal_to_bcd(_rtc_data.month);   // M 
-    data[6] = decimal_to_bcd(_rtc_data.year);   // Y
+    data[0] = decimal_to_bcd(_ertc_data.seconds);    // s 
+    data[1] = decimal_to_bcd(_ertc_data.minutes);    // m 
+    data[2] = decimal_to_bcd(_ertc_data.hours);   // h(24h)
+    data[3] = decimal_to_bcd(_ertc_data.day_of_week);    // day (1 Sunday)
+    data[4] = decimal_to_bcd(_ertc_data.day_of_month);   // Month day (1)
+    data[5] = decimal_to_bcd(_ertc_data.month);   // M 
+    data[6] = decimal_to_bcd(_ertc_data.year);   // Y
 
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start(cmd);
@@ -50,7 +50,7 @@ void rtc_set_time(rtc_data _rtc_data) {
     i2c_cmd_link_delete(cmd);
 }
 
-rtc_data rtc_read(){
+ertc_data ertc_read(){
     uint8_t data[7];
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
 
@@ -69,15 +69,15 @@ rtc_data rtc_read(){
     i2c_cmd_link_delete(cmd);
 
     // Convertir los valores de BCD a decimal
-    rtc_data _rtc_data;
-    _rtc_data.seconds = bcd_to_decimal(data[0] & 0x7F);
-    _rtc_data.minutes = bcd_to_decimal(data[1]);
-    _rtc_data.hours = bcd_to_decimal(data[2] & 0x3F);  // Para formato 24 horas
-    _rtc_data.day_of_week = bcd_to_decimal(data[3]);
-    _rtc_data.day_of_month = bcd_to_decimal(data[4]);
-    _rtc_data.month = bcd_to_decimal(data[5] & 0x1F);
-    _rtc_data.year = bcd_to_decimal(data[6]); 
+    ertc_data _ertc_data;
+    _ertc_data.seconds = bcd_to_decimal(data[0] & 0x7F);
+    _ertc_data.minutes = bcd_to_decimal(data[1]);
+    _ertc_data.hours = bcd_to_decimal(data[2] & 0x3F);  // Para formato 24 horas
+    _ertc_data.day_of_week = bcd_to_decimal(data[3]);
+    _ertc_data.day_of_month = bcd_to_decimal(data[4]);
+    _ertc_data.month = bcd_to_decimal(data[5] & 0x1F);
+    _ertc_data.year = bcd_to_decimal(data[6]); 
 
-    return _rtc_data;
+    return _ertc_data;
 }
 

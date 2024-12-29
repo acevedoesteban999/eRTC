@@ -17,10 +17,8 @@ typedef struct{
    unsigned day_of_month;   
    unsigned month;
    unsigned year;
-}rtc_data;
+}ertc_data;
 
-extern char BufferRtcI2C[25];
-
-esp_err_t rtc_init_master();
-void rtc_set_time(rtc_data _rtc_data);
-rtc_data rtc_read();
+esp_err_t ertc_init_master();
+void ertc_set_time(ertc_data _ertc_data);
+ertc_data ertc_read();
