@@ -19,6 +19,6 @@ typedef struct{
    unsigned year;
 }ertc_data;
 
-esp_err_t ertc_init_master();
+esp_err_t ertc_init();
 void ertc_set_time(ertc_data _ertc_data);
 ertc_data ertc_read();

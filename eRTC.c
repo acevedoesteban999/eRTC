@@ -9,7 +9,7 @@ uint8_t bcd_to_decimal(uint8_t bcd) {
 }
 
 
-esp_err_t ertc_init_master()
+esp_err_t ertc_init()
 {
     esp_err_t err =  ei2c_master_init(I2C_SDA_PIN,I2C_SCL_PIN,I2C_PORT);
     // is_slave_active(SLAVE_ADDRESS_RTC);
