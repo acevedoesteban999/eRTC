@@ -2,6 +2,8 @@
 
 #include "eI2C.h"
 #include "esp_log.h"
+#include <time.h>
+#include <sys/time.h>
 
 
 #define I2C_PORT I2C_NUM_0              
@@ -20,5 +22,6 @@ typedef struct{
 }ertc_data;
 
 esp_err_t ertc_init();
-void ertc_set_time(ertc_data _ertc_data);
-ertc_data ertc_read();
+void rtc_set_timedate_in_os();
+bool ertc_set_time(ertc_data _ertc_data);
+bool ertc_read(ertc_data*_ertc_data);
