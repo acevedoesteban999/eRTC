@@ -1,5 +1,8 @@
 #include "eRTC.h"
 
+
+unsigned char ERTC_SLAVE_ADDR = ERTC_DEFAULT_SLAVE_ADDR;
+
 uint8_t decimal_to_bcd(uint8_t decimal) {
     return ((decimal / 10) << 4) | (decimal % 10);
 }
@@ -11,10 +14,15 @@ uint8_t bcd_to_decimal(uint8_t bcd) {
 
 esp_err_t ertc_init()
 {
-    esp_err_t err =  ei2c_master_init(I2C_SDA_PIN,I2C_SCL_PIN,I2C_PORT);
-    // is_slave_active(SLAVE_ADDRESS_RTC);
+    esp_err_t err =  ei2c_master_init();
     return err;
 }
+
+
+void ertc_set_slave(unsigned char slave_addr){
+    ERTC_SLAVE_ADDR = slave_addr;
+}
+
 void rtc_set_timedate_in_os() {
     ertc_data rtc_time;
     ertc_read(&rtc_time);
@@ -74,7 +82,7 @@ bool ertc_set_time(ertc_data _ertc_data) {
     }
 
     i2c_master_start(cmd);
-    if (i2c_master_write_byte(cmd, (SLAVE_ADDRESS_RTC << 1) | I2C_MASTER_WRITE, true) != ESP_OK) {
+    if (i2c_master_write_byte(cmd, (ERTC_SLAVE_ADDR << 1) | I2C_MASTER_WRITE, true) != ESP_OK) {
         i2c_cmd_link_delete(cmd);
         return false;  // Fallo al escribir la dirección del RTC
     }
@@ -90,7 +98,7 @@ bool ertc_set_time(ertc_data _ertc_data) {
     }
 
     i2c_master_stop(cmd);
-    if (i2c_master_cmd_begin(I2C_NUM_0, cmd, pdMS_TO_TICKS(1000)) != ESP_OK) {
+    if (i2c_master_cmd_begin(EI2C_GPIO.PORT, cmd, pdMS_TO_TICKS(1000)) != ESP_OK) {
         i2c_cmd_link_delete(cmd);
         return false;  // Fallo en la ejecución del comando I2C
     }
@@ -110,7 +118,7 @@ bool ertc_read(ertc_data*_ertc_data){
         return false;
     
     i2c_master_start(cmd);
-    if (i2c_master_write_byte(cmd, (SLAVE_ADDRESS_RTC << 1) | I2C_MASTER_WRITE, true) != ESP_OK) {
+    if (i2c_master_write_byte(cmd, (ERTC_SLAVE_ADDR << 1) | I2C_MASTER_WRITE, true) != ESP_OK) {
         i2c_cmd_link_delete(cmd);
         return false;
     }
@@ -121,7 +129,7 @@ bool ertc_read(ertc_data*_ertc_data){
     }
 
     i2c_master_start(cmd);
-    if (i2c_master_write_byte(cmd, (SLAVE_ADDRESS_RTC << 1) | I2C_MASTER_READ, true) != ESP_OK) {
+    if (i2c_master_write_byte(cmd, (ERTC_SLAVE_ADDR << 1) | I2C_MASTER_READ, true) != ESP_OK) {
         i2c_cmd_link_delete(cmd);
         return false;
     }
@@ -135,7 +143,7 @@ bool ertc_read(ertc_data*_ertc_data){
     }
 
     i2c_master_stop(cmd);
-    if (i2c_master_cmd_begin(I2C_NUM_0, cmd, pdMS_TO_TICKS(1000)) != ESP_OK) {
+    if (i2c_master_cmd_begin(EI2C_GPIO.PORT, cmd, pdMS_TO_TICKS(1000)) != ESP_OK) {
         i2c_cmd_link_delete(cmd);
         return false;
     }
