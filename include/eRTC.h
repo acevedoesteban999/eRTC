@@ -7,13 +7,13 @@
 #define ERTC_DEFAULT_SLAVE_ADDR 0x68
 
 typedef struct{
-   unsigned seconds;
-   unsigned minutes;
-   unsigned hours;
-   unsigned day_of_week;    //1 Sunday
-   unsigned day_of_month;   
-   unsigned month;
-   unsigned year;
+   int seconds;
+   int minutes;
+   int hours;
+   int day_of_week;    //1 Sunday
+   int day_of_month;   
+   int month;
+   int year;
 }ertc_data;
 
 
