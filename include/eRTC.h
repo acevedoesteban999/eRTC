@@ -21,7 +21,7 @@ extern unsigned char ERTC_SLAVE_ADDR;
 
 esp_err_t ertc_init();
 void ertc_set_slave(unsigned char slave_addr);
-bool ertc_get_time_os(ertc_data *rtc_time);
+bool ertc_get_data_os(ertc_data *rtc_time);
 bool ertc_has_error();
 void rtc_set_timedate_in_os();
 bool ertc_set_time(ertc_data _ertc_data);
