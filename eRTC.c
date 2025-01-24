@@ -2,7 +2,7 @@
 
 
 unsigned char ERTC_SLAVE_ADDR = ERTC_DEFAULT_SLAVE_ADDR;
-
+int ertc_error = -1;
 uint8_t decimal_to_bcd(uint8_t decimal) {
     return ((decimal / 10) << 4) | (decimal % 10);
 }
@@ -23,46 +23,53 @@ void ertc_set_slave(unsigned char slave_addr){
     ERTC_SLAVE_ADDR = slave_addr;
 }
 
-void rtc_set_timedate_in_os() {
-    ertc_data rtc_time;
-    ertc_read(&rtc_time);
+bool ertc_get_time_os(ertc_data*rtc_time) {
+    
+    struct timeval tv;
+    struct tm *timeinfo;
 
-    struct tm timeinfo = {
-        .tm_sec = rtc_time.seconds,        
-        .tm_min = rtc_time.minutes,       
-        .tm_hour = rtc_time.hours,         
-        .tm_mday = rtc_time.day_of_month, 
-        .tm_mon = rtc_time.month - 1,      
-        .tm_year = rtc_time.year + 100,    
-        .tm_wday = rtc_time.day_of_week    
-    };
+    gettimeofday(&tv, NULL);
+    timeinfo = localtime(&tv.tv_sec);
 
-    time_t now = mktime(&timeinfo);
-
-    if (now == -1) {
-        ESP_LOGE("","Can not set RTC data into OS: mktime ");
-        return;
-    }
-
-    struct timeval tv = {.tv_sec = now, .tv_usec = 0};
-    if (settimeofday(&tv, NULL) != 0)
-        ESP_LOGE("","Can not set RTC data into OS: settimeofday ");
-    else 
-        ESP_LOGI("","Set RTC data into OS: %s ",asctime(&timeinfo));
+    rtc_time->year = timeinfo->tm_year;
+    rtc_time->month = timeinfo->tm_mon;
+    rtc_time->day_of_month = timeinfo->tm_mday;
+    rtc_time->hours = timeinfo->tm_hour;
+    rtc_time->minutes = timeinfo->tm_min;
+    rtc_time->seconds = timeinfo->tm_sec;
+    
+    return !ertc_has_error();
 }
 
-//TODO is_slave_active in "ertc_init_master"
-// bool is_slave_active(uint8_t slave_addr) {
-//     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
-//     i2c_master_start(cmd);
-//     i2c_master_write_byte(cmd, (slave_addr << 1) | I2C_MASTER_WRITE, true);
-//     i2c_master_stop(cmd);
-    
-//     esp_err_t ret = i2c_master_cmd_begin(I2C_PORT, cmd, pdMS_TO_TICKS(1000));
-//     i2c_cmd_link_delete(cmd);
+bool ertc_has_error(){
+    return ertc_error != 0;
+}
 
-//     return (ret == ESP_OK);
-// }
+
+void rtc_set_timedate_in_os() {
+    ertc_data rtc_time;
+    if(ertc_read(&rtc_time)){
+        struct timeval tv;
+        struct tm tm = {
+            .tm_year = rtc_time.year - 1900, 
+            .tm_mon = rtc_time.month,           
+            .tm_mday = rtc_time.day_of_month,
+            .tm_hour = rtc_time.hours,          
+            .tm_min = rtc_time.minutes,           
+            .tm_sec = rtc_time.seconds             
+        };
+
+        tv.tv_sec = mktime(&tm); 
+        tv.tv_usec = 0;
+
+       
+        settimeofday(&tv, NULL);
+        ertc_error = 0;
+    }else{
+        ertc_error = 1;
+    }
+
+}
 
 bool ertc_set_time(ertc_data _ertc_data) {
     uint8_t data[7];
@@ -107,7 +114,6 @@ bool ertc_set_time(ertc_data _ertc_data) {
 
     return true;  // Todo salió bien
 }
-
 
 bool ertc_read(ertc_data*_ertc_data){
     uint8_t data[7];
