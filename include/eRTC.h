@@ -26,3 +26,5 @@ bool ertc_has_error();
 void rtc_set_timedate_in_os();
 bool ertc_set_time(ertc_data _ertc_data);
 bool ertc_read(ertc_data*_ertc_data);
+
+uint32_t ertc_data_to_int(const ertc_data *data);

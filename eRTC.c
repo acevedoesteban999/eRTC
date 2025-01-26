@@ -172,3 +172,26 @@ bool ertc_read(ertc_data*ertc_data){
     return true;
 }
 
+
+
+uint32_t ertc_data_to_int(const ertc_data* data) {
+    uint32_t result = 0;
+    result |= (data->year << 24);
+    result |= (data->month << 20);
+    result |= (data->day_of_month << 16);
+    result |= (data->day_of_week << 12);
+    result |= (data->hours << 8);
+    result |= (data->minutes << 4);
+    result |= data->seconds;
+    return result;
+}
+
+// void ertc_int_to_data(uint32_t value, ertc_data* data) {
+//     data->year = (value >> 24) & 0xFF;
+//     data->month = (value >> 20) & 0xFF;
+//     data->day_of_month = (value >> 16) & 0xFF;
+//     data->day_of_week = (value >> 12) & 0xFF;
+//     data->hours = (value >> 8) & 0xFF;
+//     data->minutes = (value >> 4) & 0xFF;
+//     data->seconds = value & 0x0F;
+// }
