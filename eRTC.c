@@ -75,9 +75,9 @@ void rtc_set_timedate_in_os() {
 
 
 
-bool ertc_set_time(ertc_data ertc_data) {
+bool ertc_set_time(ertc_data ertc_data,uint8_t control_reg) {
 
-    uint8_t data[7];
+    uint8_t data[8];
     
     data[0] = decimal_to_bcd(ertc_data.seconds);    // s 
     data[1] = decimal_to_bcd(ertc_data.minutes);    // m 
@@ -86,6 +86,7 @@ bool ertc_set_time(ertc_data ertc_data) {
     data[4] = decimal_to_bcd(ertc_data.day_of_month);   // Month day (1)
     data[5] = decimal_to_bcd(ertc_data.month);      // M 
     data[6] = decimal_to_bcd(ertc_data.year);       // Y
+    data[7] = control_reg;                          // Control 
 
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     if (cmd == NULL) {
@@ -109,10 +110,10 @@ bool ertc_set_time(ertc_data ertc_data) {
     }
 
     i2c_master_stop(cmd);
-    if (i2c_master_cmd_begin(EI2C_GPIO.PORT, cmd, pdMS_TO_TICKS(1000)) != ESP_OK) {
-        i2c_cmd_link_delete(cmd);
-        return false; 
-    }
+    // if (i2c_master_cmd_begin(EI2C_GPIO.PORT, cmd, pdMS_TO_TICKS(1000)) != ESP_OK) {
+    //     i2c_cmd_link_delete(cmd);
+    //     return false; 
+    // }
 
     i2c_cmd_link_delete(cmd); 
     _rtc_set_timedate_in_os(ertc_data);
@@ -128,15 +129,15 @@ bool ertc_read(ertc_data*ertc_data){
         return false;
     
     i2c_master_start(cmd);
-    if (i2c_master_write_byte(cmd, (ERTC_SLAVE_ADDR << 1) | I2C_MASTER_WRITE, true) != ESP_OK) {
-        i2c_cmd_link_delete(cmd);
-        return false;
-    }
+    // if (i2c_master_write_byte(cmd, (ERTC_SLAVE_ADDR << 1) | I2C_MASTER_WRITE, true) != ESP_OK) {
+    //     i2c_cmd_link_delete(cmd);
+    //     return false;
+    // }
 
-    if (i2c_master_write_byte(cmd, 0x00, true) != ESP_OK) {
-        i2c_cmd_link_delete(cmd);
-        return false;
-    }
+    // if (i2c_master_write_byte(cmd, 0x00, true) != ESP_OK) {
+    //     i2c_cmd_link_delete(cmd);
+    //     return false;
+    // }
 
     i2c_master_start(cmd);
     if (i2c_master_write_byte(cmd, (ERTC_SLAVE_ADDR << 1) | I2C_MASTER_READ, true) != ESP_OK) {
@@ -171,6 +172,15 @@ bool ertc_read(ertc_data*ertc_data){
 
     return true;
 }
+
+
+bool ertc_configure_control(char control){
+    uint8_t write_buffer[2];
+    write_buffer[0] = DEFAULT_ERTC_REG_CONTROL; 
+    write_buffer[1] = control;  
+    return i2c_master_write_to_device(EI2C_GPIO.PORT,ERTC_SLAVE_ADDR,&write_buffer,2,pdMS_TO_TICKS(1000)) == ESP_OK;
+}
+
 
 
 
